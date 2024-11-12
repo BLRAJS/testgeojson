@@ -1,0 +1,138 @@
+openapi: 3.0.0
+info:
+  title: News API
+  version: '2.0'
+  description: API to fetch top headlines from various news sources
+
+servers:
+  - url: https://newsapi.org/v2
+    description: Production server
+
+paths:
+  /top-headlines:
+    get:
+      summary: Get top headlines
+      description: |
+        Provides live top and breaking headlines for a country, specific category in a country, 
+        single source, or multiple sources. Articles are sorted by earliest date published first.
+      parameters:
+        - name: apiKey
+          in: query
+          required: true
+          schema:
+            type: string
+          description: Your API key
+        - name: X-Api-Key
+          in: header
+          required: false
+          schema:
+            type: string
+          description: Alternative way to provide API key
+        - name: country
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: [us]
+          description: The 2-letter ISO 3166-1 code of the country
+        - name: category
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: [business, entertainment, general, health, science, sports, technology]
+          description: The category for headlines
+        - name: sources
+          in: query
+          required: false
+          schema:
+            type: string
+          description: Comma-separated string of news source identifiers
+        - name: q
+          in: query
+          required: false
+          schema:
+            type: string
+          description: Keywords or phrase to search for
+        - name: pageSize
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 20
+            maximum: 100
+          description: Number of results per page
+        - name: page
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 1
+          description: Page number for pagination
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    enum: [ok, error]
+                    description: Request status
+                  totalResults:
+                    type: integer
+                    description: Total number of results available
+                  articles:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        source:
+                          type: object
+                          properties:
+                            id:
+                              type: string
+                              description: Source identifier
+                            name:
+                              type: string
+                              description: Source display name
+                        author:
+                          type: string
+                          description: Article author
+                        title:
+                          type: string
+                          description: Article headline
+                        description:
+                          type: string
+                          description: Article description or snippet
+                        url:
+                          type: string
+                          format: uri
+                          description: Direct URL to article
+                        urlToImage:
+                          type: string
+                          format: uri
+                          description: URL to relevant image
+                        publishedAt:
+                          type: string
+                          format: date-time
+                          description: Publication date and time in UTC
+                        content:
+                          type: string
+                          description: Truncated article content (200 chars)
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    enum: [error]
+                  code:
+                    type: string
+                  message:
+                    type: string
